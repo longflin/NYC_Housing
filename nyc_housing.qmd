@@ -1,0 +1,14 @@
+---
+title: "NYC Housing"
+author: "Long Lin"
+format: html
+editor: visual
+---
+
+## Approach
+
+I am using a dataset from Kaggle with information about NYC housing prices. The dataset contains relevant information such as the borough associated with the property sale as well as the year that the primary structure on the tax lot was originally built. I will use R to process the data to make the information more applicable to my needs.
+
+## NYC Housing Prices
+
+Source: https://www.kaggle.com/datasets/ishank2005/nyc-housing-prices-csv?resource=download
