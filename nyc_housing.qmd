@@ -5,10 +5,82 @@ format: html
 editor: visual
 ---
 
-## Approach
+## Overview
 
-I am using a dataset from Kaggle with information about NYC housing prices. The dataset contains relevant information such as the borough associated with the property sale as well as the year that the primary structure on the tax lot was originally built. I will use R to process the data to make the information more applicable to my needs.
+I am using a dataset from Kaggle with information about NYC housing prices. The dataset contains relevant information such as the borough associated with the property sale as well as the year that the primary structure on the tax lot was originally built. My motivation for selecting this dataset is my interest in the local housing market, especially in Brooklyn, where I live. I will use R to process the data by filtering the data for properties in Brooklyn and by the year that they were constructed.
 
 ## NYC Housing Prices
 
 Source: https://www.kaggle.com/datasets/ishank2005/nyc-housing-prices-csv?resource=download
+
+I will read the data from my github in raw format using tidyverse.
+
+```{r}
+library(tidyverse)
+
+url <- "https://raw.githubusercontent.com/longflin/NYC_Housing/refs/heads/main/nyc_housing_base.csv"
+
+df <- read_csv(
+  file = url,
+  show_col_types = FALSE,
+  progress = FALSE
+)
+
+glimpse(df)
+
+```
+
+## Subset data
+
+First, I will create a subset that looks at sales in Brooklyn and include the sale price, zip code, year that the primary structure on the lot was built, and the lot area measured in square feet.  I also filter for properties where the primary structure was built after 1999 and that has a lot area greater than 10,000 square feet.
+
+```{r}
+library(gt)
+
+df1 <- df[df$borough_y == "BK" & df$yearbuilt > 1999 & df$lotarea > 10000, c("borough_y", "sale_price", "zip_code", "yearbuilt", "lotarea")]
+
+df1 |>
+  gt()
+
+```
+
+## Sort data
+
+Then I'll sort the data in order of year that the primary structure was built in order to improve readability.
+
+```{r}
+df2 <- df1[order(df1$yearbuilt), c("borough_y", "sale_price", "zip_code", "yearbuilt", "lotarea")]
+
+df2 |>
+  gt()
+```
+
+## Final Touches
+
+Finally, I will change the column names to be more readable, change the borough name from "BK" to "Brooklyn", and properly format the sale price to show that it's a currency value.
+
+```{r}
+df3 <- df2[order(df2$yearbuilt), c("borough_y", "sale_price", "zip_code", "yearbuilt", "lotarea")]
+
+df3 <- df3 |>
+  mutate(
+    borough_y = if_else(borough_y == "BK", "Brooklyn", borough_y)
+  )
+
+df3 |>
+  gt() |>
+  cols_label(
+    borough_y = "Borough",
+    sale_price = "Sale Price",
+    zip_code = "Zip Code",
+    yearbuilt = "Year Built",
+    lotarea = "Lot Area (sqft)"
+  ) |>
+  fmt_currency(
+    columns = sale_price,
+  )
+```
+
+## Conclusions
+
+In conclusion, something extra I would do to extend the data would be a price per square foot column to compare the pricing of the various properties independent of size. The findings based on the data shows that there are some years with multiple sales of big (10,000+ sqft) properties built after 1999 in Brooklyn, as well as some years like 2006, where there are none.
